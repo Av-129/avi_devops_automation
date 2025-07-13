@@ -4,7 +4,7 @@ variable "account-id" {
 }
 
 variable "bucket1" {
-  default     = "polaris-app-bucket"
+  default     = "abc-app-bucket"
 }
 
 #variable "sns_s3_event_name" {
@@ -14,5 +14,5 @@ variable "bucket1" {
 #
 #variable "sns_s3_event_arn" {
 #  description = "Enter S3 SNS Topic ARN"
-#  default     = "arn:aws:sns:ap-south-1:312767894698:cnb_uat_s3_sns"
+#  default     = "arn:aws:sns:ap-south-1:6789698:cnb_uat_s3_sns"
 #}
