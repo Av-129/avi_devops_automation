@@ -26,10 +26,10 @@ PIPELINE_NAMES=$(cat pipeline.txt)
 # Predefined variables (common for all pipelines)
 GITHUB_SOURCE="mdms-api"
 GITHUB_BRANCH="vb1"
-CLUSTER_NAME="gomati-pre-prod-eks"
+CLUSTER_NAME="abc-pre-prod-eks"
 AWS_ACCOUNT="205930611114"
 REPOSITORY_URI="205930611114.dkr.ecr.ap-south-1.amazonaws.com"
-MDMS_PREPAID_ENGINE_SECRET="/dev/gomati/mdms-prepaid-engine"
+MDMS_PREPAID_ENGINE_SECRET="/dev/abc/mdms-prepaid-engine"
 CODESTAR_ARN="arn:aws:codeconnections:ap-south-1:205930611114:connection/f07d6322-6150-4411-b2c3-416c6177d082"
 CODEPIPELINE_ROLE_ARN="arn:aws:iam::205930611114:role/codepipeline-role-management"
 CODEBUILD_ROLE_ARN="arn:aws:iam::205930611114:role/codebuild-role-dev"
@@ -39,8 +39,8 @@ AWS_REGION="ap-south-1"
 # Buildspec file path (same for all pipelines)
 DEV_BUILD_SPEC="./devops/buildspec"
 STAGE_BUILD_SPEC="./devops/buildspec"
-GOMATI_BUILD_SPEC="./devops/buildspec"
-SARYU_BUILD_SPEC="./devops/buildspec"
+abc_BUILD_SPEC="./devops/buildspec"
+abc_BUILD_SPEC="./devops/buildspec"
 
 # Iterate over all pipeline names and create pipeline for each
 for PIPELINE_NAME in $PIPELINE_NAMES; do
@@ -49,14 +49,14 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
   # Environment variables for all build projects
   DEV_ENV_VARS=$(get_env_vars "$CLUSTER_NAME" "$AWS_ACCOUNT" "$REPOSITORY_URI" "$MDMS_PREPAID_ENGINE_SECRET")
   STAGE_ENV_VARS=$(get_env_vars "$CLUSTER_NAME" "$AWS_ACCOUNT" "$REPOSITORY_URI" "$MDMS_PREPAID_ENGINE_SECRET")
-  GOMATI_ENV_VARS=$(get_env_vars "$CLUSTER_NAME" "$AWS_ACCOUNT" "$REPOSITORY_URI" "$MDMS_PREPAID_ENGINE_SECRET")
-  SARYU_ENV_VARS=$(get_env_vars "$CLUSTER_NAME" "$AWS_ACCOUNT" "$REPOSITORY_URI" "$MDMS_PREPAID_ENGINE_SECRET")
+  abc_ENV_VARS=$(get_env_vars "$CLUSTER_NAME" "$AWS_ACCOUNT" "$REPOSITORY_URI" "$MDMS_PREPAID_ENGINE_SECRET")
+  abc_ENV_VARS=$(get_env_vars "$CLUSTER_NAME" "$AWS_ACCOUNT" "$REPOSITORY_URI" "$MDMS_PREPAID_ENGINE_SECRET")
 
   # Generate build project names based on the pipeline name
   DEV_BUILD_PROJECT_NAME="${PIPELINE_NAME}-dev"
   STAGE_BUILD_PROJECT_NAME="${PIPELINE_NAME}-stage"
-  GOMATI_BUILD_PROJECT_NAME="${PIPELINE_NAME}-GOMATI"
-  SARYU_BUILD_PROJECT_NAME="${PIPELINE_NAME}-saryu"
+  abc_BUILD_PROJECT_NAME="${PIPELINE_NAME}-abc"
+  abc_BUILD_PROJECT_NAME="${PIPELINE_NAME}-abc"
 
   # Function to create a CodeBuild project for ARM
   create_codebuild_project() {
@@ -78,12 +78,12 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
       --region "$region"
   }
 
-  # Create CodeBuild projects for dev, stage, GOMATI, and saryu environments
+  # Create CodeBuild projects for dev, stage, abc, and abc environments
   echo "Creating CodeBuild projects for pipeline: $PIPELINE_NAME"
   create_codebuild_project "$DEV_BUILD_PROJECT_NAME" "$DEV_ENV_VARS" "$DEV_BUILD_SPEC" "$AWS_REGION"
   create_codebuild_project "$STAGE_BUILD_PROJECT_NAME" "$STAGE_ENV_VARS" "$STAGE_BUILD_SPEC" "$AWS_REGION"
-  create_codebuild_project "$GOMATI_BUILD_PROJECT_NAME" "$GOMATI_ENV_VARS" "$GOMATI_BUILD_SPEC" "$AWS_REGION"
-  create_codebuild_project "$SARYU_BUILD_PROJECT_NAME" "$SARYU_ENV_VARS" "$SARYU_BUILD_SPEC" "$AWS_REGION"
+  create_codebuild_project "$abc_BUILD_PROJECT_NAME" "$abc_ENV_VARS" "$abc_BUILD_SPEC" "$AWS_REGION"
+  create_codebuild_project "$abc_BUILD_PROJECT_NAME" "$abc_ENV_VARS" "$abc_BUILD_SPEC" "$AWS_REGION"
   echo "CodeBuild projects created successfully for $PIPELINE_NAME."
 
   # Create the pipeline JSON
@@ -185,10 +185,10 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
         ]
       },
       {
-        "name": "ApprovalForGOMATI",
+        "name": "ApprovalForabc",
         "actions": [
           {
-            "name": "ManualApprovalGOMATI",
+            "name": "ManualApprovalabc",
             "actionTypeId": {
               "category": "Approval",
               "owner": "AWS",
@@ -196,17 +196,17 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
               "version": "1"
             },
             "configuration": {
-              "CustomData": "Approval needed before proceeding to GOMATI"
+              "CustomData": "Approval needed before proceeding to abc"
             },
             "runOrder": 1
           }
         ]
       },
       {
-        "name": "GOMATIBuild",
+        "name": "abcBuild",
         "actions": [
           {
-            "name": "GOMATIBuild",
+            "name": "abcBuild",
             "actionTypeId": {
               "category": "Build",
               "owner": "AWS",
@@ -219,7 +219,7 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
               }
             ],
             "configuration": {
-              "ProjectName": "$GOMATI_BUILD_PROJECT_NAME"
+              "ProjectName": "$abc_BUILD_PROJECT_NAME"
             },
             "runOrder": 1,
             "roleArn": "$CODEBUILD_ROLE_ARN"
@@ -227,10 +227,10 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
         ]
       },
       {
-        "name": "ApprovalForSaryu",
+        "name": "ApprovalForabc",
         "actions": [
           {
-            "name": "ManualApprovalSaryu",
+            "name": "ManualApprovalabc",
             "actionTypeId": {
               "category": "Approval",
               "owner": "AWS",
@@ -238,17 +238,17 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
               "version": "1"
             },
             "configuration": {
-              "CustomData": "Approval needed before proceeding to saryu"
+              "CustomData": "Approval needed before proceeding to abc"
             },
             "runOrder": 1
           }
         ]
       },
       {
-        "name": "SaryuBuild",
+        "name": "abcBuild",
         "actions": [
           {
-            "name": "SaryuBuild",
+            "name": "abcBuild",
             "actionTypeId": {
               "category": "Build",
               "owner": "AWS",
@@ -261,7 +261,7 @@ for PIPELINE_NAME in $PIPELINE_NAMES; do
               }
             ],
             "configuration": {
-              "ProjectName": "$SARYU_BUILD_PROJECT_NAME"
+              "ProjectName": "$abc_BUILD_PROJECT_NAME"
             },
             "runOrder": 1,
             "roleArn": "$CODEBUILD_ROLE_ARN"
@@ -289,6 +289,6 @@ EOF
   echo "Build projects created:"
   echo " - $DEV_BUILD_PROJECT_NAME"
   echo " - $STAGE_BUILD_PROJECT_NAME"
-  echo " - $GOMATI_BUILD_PROJECT_NAME"
-  echo " - $SARYU_BUILD_PROJECT_NAME"
+  echo " - $abc_BUILD_PROJECT_NAME"
+  echo " - $abc_BUILD_PROJECT_NAME"
 done

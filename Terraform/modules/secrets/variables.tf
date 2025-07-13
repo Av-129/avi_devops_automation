@@ -7,14 +7,14 @@ variable "secrets" {
   }))
   default = [
     {
-#      name         = "/prod/saryu/firmware-upgrade-service"
-#      description  = "Credentials for firmware-upgrade-service saryu"
+#      name         = "/prod/abc/firmware-upgrade-service"
+#      description  = "Credentials for firmware-upgrade-service abc"
 #      secret_data  = {
-#  "S3_BUCKET": "hes-firmware-files-saryu",
-#  "REDIS_HOST": "write.redis.hes.saryu.internal",
+#  "S3_BUCKET": "hes-firmware-files-abc",
+#  "REDIS_HOST": "write.redis.hes.abc.internal",
 #  "REDIS_DB": 3,
-#  "MQTT_BROKER_URL": "broker.saryumvvnl.in",
-#  "MQTT_USERNAME": "saryuuser",
+#  "MQTT_BROKER_URL": "broker.abcmvvnl.in",
+#  "MQTT_USERNAME": "abcuser",
 #  "MQTT_BROKER_PORT": 1883,
 #  "MQTT_PASSWORD": "SYRdD27384!!",
 #  "MQTT_CLIENT_ID": "dcu-fw-ug-service"

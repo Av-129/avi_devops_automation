@@ -18,7 +18,7 @@ variable "secrets" {
  
 #############################################################################################
 
-  "hesv2 parsing service lpdd" = {
+  "hesv2 parsing service abc" = {
       name        = "service"
       description = " service"
       type        = "SecureString"
@@ -38,7 +38,7 @@ variable "common_tags" {
   description = "Tags to apply to all SSM parameters."
   type        = map(string)
   default = {
-    Environment = "LPDD"
+    Environment = "abc"
     ManagedBy   = "Terraform"
     map-migrated = "mig70U3Z9VNAJ"
 

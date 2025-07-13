@@ -7,8 +7,8 @@
             "Principal": "*",
             "Action": "s3:*",
             "Resource": [
-                "arn:aws:s3:::polaris-app-bucket",
-                "arn:aws:s3:::polaris-app-bucket/*"
+                "arn:aws:s3:::abc-app-bucket",
+                "arn:aws:s3:::abc-app-bucket/*"
             ],
             "Condition": {
                 "Bool": {

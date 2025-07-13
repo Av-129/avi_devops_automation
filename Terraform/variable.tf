@@ -5,12 +5,12 @@
 # 
 # 
 # variable "tf-state-bucket" {
-#   default     = "polaris-tf-state-bucket"
+#   default     = "abc-tf-state-bucket"
 #   description = "TF STATE BUCKET NAME"
 # }
 # 
 # variable "key" {
-#   default     = "polaris_tf_state"
+#   default     = "abc_tf_state"
 #   description = "key value for state file"
 # }
 

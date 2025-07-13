@@ -20,7 +20,7 @@ This file configures Cluster Autoscaler with the following parameters:
 
 autoDiscovery: 
 
-  clusterName: gomati-pre-prod-eks 
+  clusterName: abc-pre-prod-eks 
 
  
 
@@ -125,7 +125,7 @@ Complete cluster-autoscaler.yaml
  
 autoDiscovery: 
 
-  clusterName: gomati-ipv6-eks  # Update to your EKS cluster name 
+  clusterName: abc-ipv6-eks  # Update to your EKS cluster name 
 
  
 

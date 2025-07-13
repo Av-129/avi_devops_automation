@@ -3,7 +3,7 @@
 REGION="ap-south-1"  # Change this to your desired region
 
 # Directory to store the output
-OUTPUT_DIR="Gomati-testing"
+OUTPUT_DIR="abc-testing"
 mkdir -p $OUTPUT_DIR
 
 # Function to get all CodeBuild projects

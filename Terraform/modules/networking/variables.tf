@@ -9,7 +9,7 @@
 # variable "account_name" {
 # 
 #   description = "AWS Account Name"
-#   default     = "Polaris"
+#   default     = "abc"
 #   nullable    = false
 # }
 # 
@@ -20,7 +20,7 @@
 # }
 # 
 # variable "namespace" {
-#   default  = "polaris"
+#   default  = "abc"
 #   nullable = false
 # }
 # 
@@ -166,5 +166,5 @@ variable "pvt_app_cidr_blocks_ipv6" {
 
 variable "cluster_name" {
   description = "Enter the EKS Cluster Name"
-  default     = "polaris-cluster"
+  default     = "abc-cluster"
 }

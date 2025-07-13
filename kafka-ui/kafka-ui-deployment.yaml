@@ -85,11 +85,11 @@ spec:
       tolerations:  # Add any necessary tolerations for tainted nodes (no `NotIn` operator)
         - key: "eks.amazonaws.com/nodegroup"
           operator: "Equal"
-          value: "gomati-arm-ng"
+          value: "abc-arm-ng"
           effect: "NoSchedule"
         - key: "eks.amazonaws.com/nodegroup"
           operator: "Equal"
-          value: "node-amd-Dev-gomati"
+          value: "node-amd-Dev-abc"
           effect: "NoSchedule"
       affinity:
         nodeAffinity:
@@ -99,8 +99,8 @@ spec:
                   - key: eks.amazonaws.com/nodegroup
                     operator: NotIn
                     values:
-                      - gomati-arm-ng
-                      - node-amd-Dev-gomati
+                      - abc-arm-ng
+                      - node-amd-Dev-abc
 ---
 apiVersion: v1
 kind: Service

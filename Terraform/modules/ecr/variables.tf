@@ -1,7 +1,7 @@
 variable "ecr_repository_names" {
   description = "List of ECR repositories to create"
   type        = list(string)
-  default     = [ "lpdd/prod/hes-v2/command-dispatcher-service",
+  default     = [ "abc/prod/hes-v2/command-dispatcher-service",
   "abc"
 ] # Modify this list to add more repos
 }

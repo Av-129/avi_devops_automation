@@ -19,8 +19,8 @@ while read -r REPO; do
     
     echo "Creating repositories for $REPO in Account B..."
     
-    # Create dev, stage, gomati, and saryu repositories
-    for SUFFIX in "-dev" "-stage" "-gomati" "-saryu"; do
+    # Create dev, stage, abc, and abc repositories
+    for SUFFIX in "-dev" "-stage" "-abc" "-abc"; do
         NEW_REPO="$REPO$SUFFIX"
         if ! aws ecr describe-repositories --region $REGION --repository-names $NEW_REPO >/dev/null 2>&1; then
             echo "Creating repository $NEW_REPO in Account B"

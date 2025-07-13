@@ -68,7 +68,7 @@ resource "aws_codepipeline" "pipeline" {
   }
 
   name     = each.key
-  role_arn = "arn:aws:iam::53346:role/codepipeline-role-lpdd"
+  role_arn = "arn:aws:iam::53346:role/codepipeline-role-abc"
   pipeline_type = "V2"
 
   artifact_store {

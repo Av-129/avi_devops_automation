@@ -37,7 +37,7 @@ variable "pipelines" {
        codestar_connection_arn = "arn:aws:codeconnections:ap-south-1:353346:connection/85eaf9f7-269f-4454-a92f-58d0fbf4b595"
        
        build_project_name         = "service"
-       build_project_description  = "Build project for lpdd-prod-nms-bridge-service"
+       build_project_description  = "Build project for abc-prod-nms-bridge-service"
        buildspec                  = "./devops/buildspec.yaml"
        build_timeout              = 60
    codebuild_compute_type     = "BUILD_GENERAL1_SMALL"
