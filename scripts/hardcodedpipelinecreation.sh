@@ -24,16 +24,16 @@ get_env_vars() {
 PIPELINE_NAMES=$(cat pipeline.txt)
 
 # Predefined variables (common for all pipelines)
-GITHUB_SOURCE="mdms-api"
-GITHUB_BRANCH="vb1"
-CLUSTER_NAME="abc-pre-prod-eks"
-AWS_ACCOUNT="205930611114"
-REPOSITORY_URI="205930611114.dkr.ecr.ap-south-1.amazonaws.com"
-MDMS_PREPAID_ENGINE_SECRET="/dev/abc/mdms-prepaid-engine"
-CODESTAR_ARN="arn:aws:codeconnections:ap-south-1:205930611114:connection/f07d6322-6150-4411-b2c3-416c6177d082"
-CODEPIPELINE_ROLE_ARN="arn:aws:iam::205930611114:role/codepipeline-role-management"
-CODEBUILD_ROLE_ARN="arn:aws:iam::205930611114:role/codebuild-role-dev"
-S3_BUCKET_NAME="codepipeline-ap-south-1-205930611114"
+GITHUB_SOURCE="engine"
+GITHUB_BRANCH="v1"
+CLUSTER_NAME="abc-eks"
+AWS_ACCOUNT="2541234"
+REPOSITORY_URI="2541234.dkr.ecr.ap-south-1.amazonaws.com"
+ENGINE_SECRET="/dev/abc/engine"
+CODESTAR_ARN="arn:aws:codeconnections:ap-south-1:2541234:connection/f07d6322-6150-4411-b2c3-416c6177d082"
+CODEPIPELINE_ROLE_ARN="arn:aws:iam::2541234:role/codepipeline-role-management"
+CODEBUILD_ROLE_ARN="arn:aws:iam::2541234:role/codebuild-role-dev"
+S3_BUCKET_NAME="codepipeline-ap-south-1-1114"
 AWS_REGION="ap-south-1"
 
 # Buildspec file path (same for all pipelines)
