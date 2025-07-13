@@ -1,0 +1,245 @@
+# Default values for abc-api
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  tag: latest
+
+
+containers:
+  - name: auth-test
+    image: "1212.dkr.ecr.ap-south-1.amazonaws.com/auth-test"
+    imagePullPolicy: Always
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+    ports:
+      - name: http
+        containerPort: 8000
+        protocol: TCP
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 8
+      failureThreshold: 3
+      successThreshold: 1
+      path: healthz
+      port: 8000
+      healthcheckHttps: false
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 8
+      failureThreshold: 3
+      successThreshold: 1
+      path: ready
+      port: 8000
+    resources:
+      limits:
+        cpu: 300m
+        memory: 600Mi
+      requests:
+        cpu: 150m
+        memory: 400Mi
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+service:
+  enabled: true
+  type: ClusterIP
+  port: 8000
+
+deployment:
+  minReadySeconds: 60      
+  rollingUpdate:
+    maxUnavailable: "25%"   
+    maxSurge: "25%"   
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 90
+
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+tolerations:
+  - key: "service"
+    operator: "Equal"
+    value: "abc"
+    effect: "NoSchedule"
+
+
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: eks.amazonaws.com/nodegroup
+          operator: In
+          values:
+          - Nodegroup
+
+##########################################################################################################
+
+# Default values for abc-api
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+imagePullSecrets:
+  - name: ecr-secret
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  tag: ""
+
+containers:
+  - name: auth-test
+    image: "11114.dkr.ecr.ap-south-1.amazonaws.com/test"
+    imagePullPolicy: Always
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+    ports:
+      - name: http
+        containerPort: 8000
+        protocol: TCP
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 8
+      failureThreshold: 3
+      successThreshold: 1
+      path: healthz
+      port: 8000
+      healthcheckHttps: false
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 60
+      timeoutSeconds: 8
+      failureThreshold: 3
+      successThreshold: 1
+      path: ready
+      port: 8000
+    resources: {}
+      # limits:
+      #   cpu: 300m
+      #   memory: 600Mi
+      # requests:
+      #   cpu: 150m
+      #   memory: 400Mi
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+service:
+  enabled: true
+  type: ClusterIP
+  port: 8000
+  externalTrafficPolicy: Local
+deployment:
+  minReadySeconds: 60       
+  rollingUpdate:
+    maxUnavailable: "25%"   
+    maxSurge: "25%"   
+
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-south-1:50019771:certificate/1f4882bc-5362-4217-bbda-464547f7f9f2"
+    alb.ingress.kubernetes.io/group.name: abc
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "300"
+    alb.ingress.kubernetes.io/ip-address-type: dualstack
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/subnets: "subn432d7"
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/tags: map-migrated=**
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    
+  hosts:
+    - host: auth-service.abc.in
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+
+
+
+autoscaling:
+  enabled: false
+  # minReplicas: 2
+  # maxReplicas: 5
+  # targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 90
+
+
+
+podAntiAffinity:
+  enabled: false
+  topologyKey: "kubernetes.io/hostname"
+
+pdb:
+  enabled: false
+  minAvailable: 1
+
+
+tolerations:
+  - key: "service"
+    operator: "Equal"
+    value: "abc"
+    effect: "NoSchedule"
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: eks.amazonaws.com/nodegroup
+          operator: In
+          values:
+          - Nodegroup
+
+topologySpreadConstraints:
+  enabled: true

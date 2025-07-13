@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app.fullname" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "app.selectorLabels" . | nindent 6 }}
+  
+  minReadySeconds: {{ .Values.deployment.minReadySeconds | default 300 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.deployment.rollingUpdate.maxUnavailable | default "25%" }}
+      maxSurge: {{ .Values.deployment.rollingUpdate.maxSurge | default "25%" }}
+
+  template:
+    metadata:
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        {{- $imageTag := default .Chart.AppVersion .Values.image.tag }}
+        {{- $env := .Values.deployment.environment }}
+        {{- range .Values.containers }}
+        - name: {{ .name }}
+          {{- if ((.securityContext)) }}
+          securityContext:
+            {{- toYaml .securityContext | nindent 12 }}
+          {{- end }}
+          image: "{{ .image }}:{{ .imageTag | default $imageTag }}"
+          imagePullPolicy: {{ .imagePullPolicy }}
+          {{- if ((.ports)) }}
+          ports:
+            {{- toYaml .ports | nindent 12 }}
+          {{- end }}
+          env:
+            {{- range $env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+            {{- end }}  
+          {{- if ((.livenessProbe)) }}
+          {{- if .livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .livenessProbe.successThreshold }}
+            failureThreshold: {{ .livenessProbe.failureThreshold }}
+            httpGet:
+              path: /{{ .livenessProbe.path }}
+              port: {{ .livenessProbe.port }}
+              {{- if .livenessProbe.healthcheckHttps }}
+              scheme: HTTPS
+              {{- end }}
+              {{- if .livenessProbe.headers }}
+              httpHeaders: {{- toYaml .livenessProbe.headers | nindent 16 }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if ((.readinessProbe)) }}
+          {{- if .readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .readinessProbe.successThreshold }}
+            failureThreshold: {{ .readinessProbe.failureThreshold }}
+            httpGet:
+              path: /{{ .readinessProbe.path }}
+              port: {{ .livenessProbe.port }}
+              {{- if .readinessProbe.healthcheckHttps }}
+              scheme: HTTPS
+              {{- end }}
+              {{- if .readinessProbe.headers }}
+              httpHeaders: {{- toYaml .readinessProbe.headers | nindent 16 }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+        {{- end }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

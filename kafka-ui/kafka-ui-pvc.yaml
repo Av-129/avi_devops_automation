@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-ui-pvc
+  namespace: kafka-ui
+  annotations:
+    ebs.csi.aws.com/volume-tags: "map-migrated=**"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: gp3-10k

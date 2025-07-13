@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: abc
+  namespace: Node-v2
+spec:
+  timeZone: Asia/Kolkata
+  schedule: "0 1,5,9,13,17,21 * * *" 
+  concurrencyPolicy: Forbid 
+  successfulJobsHistoryLimit: 1 
+  failedJobsHistoryLimit: 1 
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          serviceAccountName: s3-access-sa
+          automountServiceAccountToken: true
+          imagePullSecrets:
+          - name: ecr-secret
+          nodeSelector: 
+              kubernetes.io/arch: amd64
+          containers:
+          - name: abc
+            image: 611114.dkr.ecr.ap-south-1.amazonaws.com/abc:latest
+            # resources:
+            #   requests:
+            #     memory: "1000Mi"
+            #     cpu: "400m"
+            #   limits:
+            #     memory: "1200Mi"
+            #     cpu: "500m"
+            ports:
+            - containerPort: 80
+          restartPolicy: OnFailure
+          tolerations:
+            - key: "service"
+              operator: "Equal"
+              value: "Node"
+              effect: "NoSchedule"
+
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: eks.amazonaws.com/nodegroup
+                        operator: In
+                        values:
+                          - Nodegroup

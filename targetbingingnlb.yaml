@@ -1,0 +1,9 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: TGB_name
+spec:
+  serviceRef:
+    name: Service_name
+    port: 1235 # nodeport
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-south-1:87867:targetgroup/test/5d252db249be8dea

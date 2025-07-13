@@ -1,0 +1,133 @@
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: kafka-ui
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: kafka-ui
+#   namespace: kafka-ui
+# spec:
+#   replicas: 1  # Ensures there is always one instance running
+#   selector:
+#     matchLabels:
+#       app: kafka-ui
+#   template:
+#     metadata:
+#       labels:
+#         app: kafka-ui
+#     spec:
+#       containers:
+#         - name: kafka-ui
+#           image: provectuslabs/kafka-ui
+#           ports:
+#             - containerPort: 8080
+#           env:
+#             - name: DYNAMIC_CONFIG_ENABLED
+#               value: "true"
+#           securityContext:
+#             runAsUser: 0  # Run as root temporarily
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: kafka-ui-service
+#   namespace: kafka-ui
+# spec:
+#   selector:
+#     app: kafka-ui
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 8080
+#   type: ClusterIP  # Only accessible within the cluster
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  namespace: kafka-ui
+spec:
+  replicas: 1  # Ensures there is always one instance running
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+        - name: kafka-ui
+          image: provectuslabs/kafka-ui
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DYNAMIC_CONFIG_ENABLED
+              value: "true"
+          securityContext:
+            runAsUser: 0  # Run as root temporarily
+          resources:
+            requests:
+              cpu: "1"          # 1 vCPU
+              memory: "1Gi"      # 1 GB of RAM
+            limits:
+              cpu: "2"          # 2 vCPU
+              memory: "2Gi"      # 2 GB of RAM
+      nodeSelector:
+        kubernetes.io/arch: arm64  # Schedule the pod on ARM nodes (arm64 architecture)
+      tolerations:  # Add any necessary tolerations for tainted nodes (no `NotIn` operator)
+        - key: "eks.amazonaws.com/nodegroup"
+          operator: "Equal"
+          value: "gomati-arm-ng"
+          effect: "NoSchedule"
+        - key: "eks.amazonaws.com/nodegroup"
+          operator: "Equal"
+          value: "node-amd-Dev-gomati"
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: eks.amazonaws.com/nodegroup
+                    operator: NotIn
+                    values:
+                      - gomati-arm-ng
+                      - node-amd-Dev-gomati
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui-service
+  namespace: kafka-ui
+spec:
+  selector:
+    app: kafka-ui
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP  # Only accessible within the cluster
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kafka-ui-pdb
+  namespace: kafka-ui
+spec:
+  minAvailable: 1  # Ensure that at least one pod is available during voluntary disruptions
+  selector:
+    matchLabels:
+      app: kafka-ui
+
+
+
+
+

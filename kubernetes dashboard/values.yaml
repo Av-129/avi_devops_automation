@@ -1,0 +1,5 @@
+kong:
+  proxy:
+    containerPort: 80
+    service:
+      port: 80

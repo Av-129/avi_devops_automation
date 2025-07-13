@@ -1,0 +1,51 @@
+{
+    "Version": "2012-10-17",
+    "Id": "key-policies",
+    "Statement": [
+        {
+            "Sid": "Enable IAM User Permissions for administration of this key",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::167062668708:root"
+            },
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow cloudwatch metric to use this key",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudwatch.amazonaws.com"
+            },
+            "Action": [
+                "kms:Decrypt",
+                "kms:GenerateDataKey*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow S3 metric to use this key",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "s3.amazonaws.com"
+            },
+            "Action": [
+                "kms:Decrypt",
+                "kms:GenerateDataKey*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "Allow RDS metric to use this key",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "events.rds.amazonaws.com"
+            },
+            "Action": [
+                "kms:Decrypt",
+                "kms:GenerateDataKey*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

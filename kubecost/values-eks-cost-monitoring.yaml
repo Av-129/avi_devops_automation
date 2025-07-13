@@ -1,0 +1,114 @@
+kubecostProductConfigs:
+  clusterName: "abc-eks"
+
+networkCosts:
+  enabled: true
+  config:
+    services:
+      amazon-web-services: true
+
+persistentVolume:
+  enabled: true
+  size: 32Gi
+  storageClass: gp3-10k
+
+costAnalyzer:
+  tolerations:
+    - key: "service"
+      operator: "Equal"
+      value: "abc"
+      effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+            - key: eks.amazonaws.com/nodegroup
+              operator: In
+              values:
+                - nodegroup
+
+prometheus:
+  server:
+    persistentVolume:
+      enabled: true
+      size: 32Gi
+      storageClass: gp3-10k
+    tolerations:
+      - key: "service"
+        operator: "Equal"
+        value: "abc"
+        effect: "NoSchedule"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+              - key: eks.amazonaws.com/nodegroup
+                operator: In
+                values:
+                  - nodegroup
+  nodeExporter:
+    enabled: true
+    resources:
+      limits:
+        cpu: 200m
+        memory: 50Mi
+    tolerations:
+      - key: "service"
+        operator: "Equal"
+        value: "abc"
+        effect: "NoSchedule"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+              - key: eks.amazonaws.com/nodegroup
+                operator: In
+                values:
+                  - nodegroup
+  configmapReload:
+    prometheus:
+      enabled: false  # Recommended to disable due to previous issues
+  serviceAccounts:
+    nodeExporter:
+      create: true
+
+kubecostCloudIntegration:
+  enabled: true
+  aws:
+    enabled: true
+    usePodIdentity: true
+
+grafana:
+  enabled: true
+  tolerations:
+    - key: "service"
+      operator: "Equal"
+      value: "abc"
+      effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+            - key: eks.amazonaws.com/nodegroup
+              operator: In
+              values:
+                - nodegroup
+
+global:
+  grafana:
+    enabled: true
+
+namespace: kubecost
+
+
+
+# helm upgrade --install kubecost `
+#   oci://public.ecr.aws/kubecost/cost-analyzer `
+#   --version 1.106.0 `
+#   --namespace kubecost `
+#   --create-namespace `
+#   -f .\values-eks-cost-monitoring.yaml
