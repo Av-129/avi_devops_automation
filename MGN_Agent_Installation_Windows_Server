@@ -1,0 +1,13 @@
+# Export the credentials
+
+# Export the creds of AWS for powershell
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Download the AWS MGN agent installer
+Invoke-WebRequest -Uri "https://aws-application-migration-service-us-east-1.s3.us-east-1.amazonaws.com/latest/windows/AwsReplicationWindowsInstaller.exe" `
+         -OutFile "AwsReplicationWindowsInstaller.exe"
+
+# Start the installer in silent mode for region us-east-1
+Start-Process -FilePath ".\AwsReplicationWindowsInstaller.exe" `
+       -ArgumentList "--region", "us-east-1", "--no-prompt" `
+       -Wait -NoNewWindow
