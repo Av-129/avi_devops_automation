@@ -1,0 +1,127 @@
+# Once we are donw with the final cutover from on prem to aws environment we will proceed with the steps below
+
+SQL Downgrade Process (AWS Environment)
+
+This guide outlines the step-by-step process for performing SQL downgrades using AWS MGN (Application Migration Service) and EC2 instances.
+
+Prerequisites
+
+Access to AWS console and necessary permissions.
+
+Access to passwords
+
+Powershell available on Windows instances.
+
+Knowledge of the current instance IP, type, and replication configuration.
+
+1. Check AWS Backups
+
+Check for backups of the target server (e.g., cXXXXX-03).
+
+2. Verify Usage Operation Type
+
+Determine the current UsageOperation value to ensure it’s suitable for downgrade.
+
+3. Instance Details
+
+Check the instance size (e.g., m7i-flex.large).
+
+Identify the instance private IP (used later to launch a new instance), e.g., 10.150.x.x.
+
+4. Export AWS Tags
+
+Use the following command to describe and save AWS tags for later re-application:
+
+aws ec2 describe-tags \
+    --filters "Name=resource-id,Values=i-0d23319***f9a16" \
+    --query "Tags[].{Key:Key,Value:Value}" \
+    --output json \
+    --region us-east-1 > c15xx-tags.json
+
+5. Edit Replication Configuration Template
+
+Update required subnet.
+
+Use private IP.
+
+Disable throttling.
+
+Open EC2 Launch Template:
+
+Edit template and check Advanced Details.
+
+Ensure IAM profile is default.
+
+Check User Data.
+
+6. Set EC2 Launch Template User Data
+
+Example PowerShell script to reset DNS and restart the instance:
+
+# Get the interface name
+$InterfaceName = Get-NetAdapter | Select-Object -ExpandProperty Name
+
+# Remove static DNS settings and revert to DHCP
+Set-DnsClientServerAddress -InterfaceAlias $InterfaceName -ResetServerAddresses
+
+# Restart the instance
+Restart-Computer -Force
+
+7. Install AWS MGN Agent
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Download the installer
+Invoke-WebRequest -Uri "https://aws-application-migration-service-us-east-1.s3.us-east-1.amazonaws.com/latest/windows/AwsReplicationWindowsInstaller.exe" `
+    -OutFile "AwsReplicationWindowsInstaller.exe"
+
+# Run installer silently
+Start-Process -FilePath ".\AwsReplicationWindowsInstaller.exe" `
+    -ArgumentList "--region", "us-east-1", "--no-prompt" `
+    -Wait -NoNewWindow
+
+8. Downgrade UsageOperation (0006 → 0002)
+
+Check replication health.
+
+Verify disk type in MGN service:
+
+Must be GP3. Pause/resume replication until status is Ready for Testing.
+
+Ensure post-launch templates have only SSM agent active.
+
+Edit launch template:
+
+Assign static IP (e.g., 10.150.x.x).
+
+Set instance type (e.g., r7i.large).
+
+Make the latest version default.
+
+Use sa credentials from 1Password to connect via SSMS.
+
+aws mgn change-server-life-cycle-state \
+    --source-server-id s-3243e3a03e0***f \
+    --life-cycle '{"state":"READY_FOR_CUTOVER"}' \
+    --region us-east-1
+
+
+Pause replication.
+
+Disable termination protection and terminate the old 03 server.
+
+Launch cutover instance from AWS MGN.
+
+Delete attached volumes of old server (keep IDs for reference).
+
+After launch, configure port forwarding or check services and verify SSMS connectivity from 04 server:
+
+Test-NetConnection -ComputerName 103-serverIP -Port 1433
+
+
+Reapply saved tags to the new 03 server.
+
+Enable termination protection.
+
+Verify UsageOperation is 0002.
+
+Finalize cutover in MGN service.
